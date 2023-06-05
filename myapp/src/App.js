@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import UilReact from '@iconscout/react-unicons/icons/uil-react'
 import TopButtons from './components/TopButtons';
 import Inputs from './components/Inputs';
@@ -12,7 +12,7 @@ import ReactSpeedometer from 'react-d3-speedometer';
 import AQISpeedoMeter from './components/AQISpeedoMeter';
 import getformatteddata from './services/AQIService';
 import getAQIData from './services/AQIService';
-
+import { useState } from 'react';
 
 /*
 
@@ -35,27 +35,41 @@ And you will get this result:
 
 function App() {
 
-  const fetchAir = async (city) => {
-    const data  = getAQIData(city)
-    console.log(data)
-    console.log(data.idx)
+  const [query , setAQI] = useState({})
+  const [city , setCity] = useState("")
 
+  useEffect(()=>{
+    const fetchAir = async (city) => {
+      //setCity(city)
+      await getformatteddata(city)
+      .then( (data)=>{
+          setAQI(data)
+      })
+    }
+    fetchAir("mumbai")
+    
+    
 
   }
 
+  ,[query , city])
 
-  fetchAir("mumbai")
+
 
 
   return (
     <div className='mx-auto max-w-screen-md mt-4 py-5 px-32 bg-gradient-to-br from-black to-red-500 h-fit shadow-xl shadow-gray-400'>
       <TopButtons></TopButtons>
       <Inputs></Inputs>
-      <TimeAndLocation></TimeAndLocation>
-      <AQISpeedoMeter></AQISpeedoMeter>
-      <AqiAndDetails></AqiAndDetails>
-      <Forecast title = "hourly forecast"/>
-      <Forecast title = "daily forecast"/>
+        {query && (
+          <div>  
+            <TimeAndLocation data = {query}  ></TimeAndLocation>
+            <AQISpeedoMeter data = {query}></AQISpeedoMeter>
+            <AqiAndDetails  data = {query}></AqiAndDetails>
+            <Forecast title = "hourly forecast"/>
+            <Forecast title = "daily forecast"/>
+          </div>
+      )}
     </div>
   );
 }
